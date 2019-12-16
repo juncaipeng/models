@@ -1440,6 +1440,7 @@ class OpTest(OpTestBase):
 
         if cls.__name__ not in op_accuracy_white_list.NO_NEED_FP64_CHECK_GRAD_CASES \
             and not hasattr(cls, 'exist_fp64_check_grad') \
-            and cls.op_type not in op_accuracy_white_list.NO_FP64_CHECK_GRAD_OP_LIST:
+            and cls.op_type not in op_accuracy_white_list.NO_FP64_CHECK_GRAD_OP_LIST \
+            and self.op_type not in op_accuracy_white_list.FP16_CHECK_OP_LIST:
             raise AssertionError("This test of %s op needs fp64 check_grad." %
                                  cls.op_type)
