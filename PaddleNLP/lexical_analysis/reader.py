@@ -20,7 +20,8 @@ import argparse
 import __future__
 import io
 import glob
-
+import numpy as np
+import paddle.fluid as fluid
 
 def load_kv_dict(dict_path,
                  reverse=False,
@@ -127,6 +128,20 @@ class Dataset(object):
             fread.close()
 
         return wrapper
+    
+    def infer_reader(self, filename, place, max_seq_len=64):
+        def wrapper():
+            fread = io.open(filename, "r", encoding="utf-8")
+            for line in fread:
+                words = line.strip()
+                word_ids = self.word_to_ids(words)
+                lod_data = [np.array(word_ids[0:max_seq_len]).astype(np.int64)]
+                base_shape = [[len(c) for c in lod_data]]
+                tensor_words = fluid.create_lod_tensor(lod_data, base_shape, place)
+                yield tensor_words
+            fread.close()
+        return wrapper
+
 
 
 if __name__ == "__main__":
